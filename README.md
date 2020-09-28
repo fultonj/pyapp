@@ -1,6 +1,12 @@
 # pyapp
 
-Simple Python App for use with Code Ready Containers
+Simple Python App to test Ceph connections.
+
+If cephx key called `ceph.client.openstack.keyring` and a `ceph.conf`
+are placed in the same directory as the `wsgi.py` app, then the app
+uses them to  connect to the Ceph cluster. If it can connect it will
+then write and remove test data on that cluster's `volumes` pool and
+show the results of doing this over HTTP.
 
 ## Create
 ```

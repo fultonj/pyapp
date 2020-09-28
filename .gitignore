@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Genereated ceph files
+ceph.client.openstack.keyring
+ceph.conf
