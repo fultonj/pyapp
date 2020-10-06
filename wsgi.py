@@ -1,4 +1,6 @@
+import configparser
 import rados
+import socket
 
 from flask import Flask
 application = Flask(__name__)
@@ -9,13 +11,29 @@ def show_ceph_test_results():
     return results+"\r\n", 200, { 'Content-Type': 'text/plain' }
 
 def ceph_test():
+    ceph_conf = 'ceph.conf'
     try:
-        with open('ceph.conf', 'r') as f:
+        with open(ceph_conf, 'r') as f:
             msg = "Using ceph.conf with the following:"
             msg += "\r\n"
             msg += f.read()
             msg += "\r\n"
         try:
+            # check if ceph mon service is exposed
+            config = configparser.ConfigParser()
+            config.read(ceph_conf)
+            ip, port = mon_host = config['global']['mon_host'].split(':')
+            a_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            location = (str(ip), int(port))
+            result_of_check = a_socket.connect_ex(location)
+            msg += "\r\n"
+            if result_of_check == 0:
+                msg += "%s:%s is open" % (ip, port)
+            else:
+                msg += "%s:%s is closed" % (ip, port)
+            msg += "\r\n"
+            a_socket.close()
+
             with open('ceph.client.openstack.keyring', 'r') as f:
                 msg += "Using ceph.client.openstack.keyring with the following:"
                 msg += "\r\n"
